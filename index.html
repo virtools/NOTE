@@ -53,7 +53,7 @@
                     <a
                       class="nav-link"
                       :class="{active:filter==sideItem.id}"
-                      href="javascript:void();"
+                      href="javascript:void(0);"
                       @click="navItem_click('view',sideItem)"
                       >{{sideItem.title}}</a
                     >
@@ -198,10 +198,10 @@
             /*toolbar: ["bold", "italic", "bulletedList", "|", "numberedList", "alignment"],
             removePlugins: ["Heading", "Link"],
             isReadOnly: true,*/
-            cloudServices: {
+            /*cloudServices: {
               tokenUrl: "https://example.com/cs-token-endpoint",
               uploadUrl: "https://your-organization-id.cke-cs.com/easyimage/upload/",
-            },
+            },*/
           },
           page: "view", //edit,view
           pageState: "all",

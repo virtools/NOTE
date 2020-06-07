@@ -1,185 +1,269 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document</title>
+    <title>筆記</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+      crossorigin="anonymous"
+    />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <style>
-      .textarea {
-        position: relative;
-        display: block;
-        width: 800px;
-        height: 600px;
-        border: 1px solid #000;
-        overflow: auto;
+      [v-cloak] {
+        display: none;
+        /*align-items: flex-start;
+        align-content: flex-start;
+        justify-content: flex-start;
+        align-self: start;*/
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" v-cloak>
+      <div class="d-flex">
+        <div class="content container">
+          <div class="row">
+            <div class="col-sm-3 sidebar my-nav">
+              <nav class="navbar navbar-expand-lg justify-content-center">
+                <button type="button" class="btn btn-primary" @click="new_click">新增筆記</button>
+              </nav>
+              <ul class="nav nav-pills flex-column">
+                <li class="nav-item" v-for="sideItem in sideNav">
+                  <a
+                    class="nav-link"
+                    :class="{active:filter==sideItem.id}"
+                    href="javascript:void(0);"
+                    @click="navItem_click('view',sideItem)"
+                    >{{sideItem.title}}</a
+                  >
+                </li>
+              </ul>
+            </div>
+            <div class="col p-0">
+              <div class="topbar my-nav">
+                <nav class="navbar navbar-expand-lg justify-content-start">
+                  <button type="button" class="btn btn-primary" @click="new_click">新增筆記</button>
+                </nav>
+                <ul class="nav nav-tabs flex-row">
+                  <li class="nav-item" v-for="sideItem in sideNav">
+                    <a
+                      class="nav-link"
+                      :class="{active:filter==sideItem.id}"
+                      href="javascript:void();"
+                      @click="navItem_click('view',sideItem)"
+                      >{{sideItem.title}}</a
+                    >
+                  </li>
+                </ul>
+              </div>
+              <div v-if="page=='view'">
+                <div class="container-fluid p-4">
+                  <div class="row">
+                    <div
+                      class="col-lg-6 col-xl-4"
+                      v-for="(item) in list"
+                      v-if="filter=='all'||(filter=='star' && item.star)"
+                    >
+                      <!--card-->
+                      <div class="card mb-4 shadow-sm">
+                        <div class="card-body">
+                          <h5 class="card-title">
+                            <button type="button" class="btn btn-sm p-0" @click="star_click(item)">
+                              <i class="material-icons icon-star" v-if="item.star">star</i>
+                              <i class="material-icons icon-star" v-else>star_border</i>
+                            </button>
+                            <span>{{item.title}}</span>
+                          </h5>
+                          <p class="card-text ellipsis">
+                            <!-- {{ellipsis(item.content)}} -->
+                            {{item.ellipsis}}
+                          </p>
+                          <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary" @click="more_click(item)">
+                              more
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else-if="page=='edit'||page=='new'">
+                <!-- <div id="editor"></div> -->
+                <div class="d-flex flex-column min-vh-100">
+                  <nav class="navbar navbar-expand-lg flex-grow-4 px-0">
+                    <button type="button" class="btn btn-danger btn-sm" @click="close_click">╳</button>
+                    <div class="flex-grow-1 justify-content-end text-right">
+                      <button type="button" class="btn btn-success btn-sm" @click="save_click">儲存</button>
+                    </div>
+                  </nav>
+                  <div class="input-group py-2">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">標題</span>
+                    </div>
+                    <input type="text" class="flex-fill" v-model="editorTitle" />
+                  </div>
+                  <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+      integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+      integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+      crossorigin="anonymous"
+    ></script>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/16.0.0/classic/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ckeditor/ckeditor5-vue@1.0.1/dist/ckeditor.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery-ellipsis@0.1.6/dist/jquery.ellipsis.min.js"></script> -->
+    <style>
+      * {
+        font-family: "Noto Sans TC", var(--font-family-sans-serif);
+      }
+      .ck-editor__editable_inline {
+        flex: 1;
+      }
+      .ck-editor {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .ck-editor__main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .ck-content {
+        word-break: break-all;
+      }
+      .sidebar.my-nav {
+        display: none !important;
+      }
+      .topbar.my-nav {
+        display: block !important;
+      }
+
+      .icon-star {
+        color: #ffdd00;
+      }
+
+      @media (min-width: 992px) {
+        .sidebar.my-nav {
+          display: block !important;
+        }
+        .topbar.my-nav {
+          display: none !important;
+        }
+      }
+      .ellipsis {
+        word-break: break-all;
+        overflow: hidden;
+        height: 1.5rem;
       }
     </style>
     <script>
-      window.onload = function() {
-        var color_el = document.getElementById("color");
-        var fontSize_el = document.getElementById("fontSize");
-        var textarea_el = document.getElementById("textarea");
-        color_el.addEventListener("change", function(e) {
-          selectionAddStyle(textarea_el, function(font) {
-            font.style.color = e.currentTarget.value;
-          });
-        });
-        fontSize_el.addEventListener("change", function(e) {
-          selectionAddStyle(textarea_el, function(font) {
-            font.style.fontSize = e.currentTarget.value + "px";
-          });
-        });
-        textarea_el.addEventListener("click", function(e) {
-          //selectionAddStyle(textarea_el);
-        });
-        textarea_el.addEventListener("keydown", function(e) {
-          if (e.keyCode === 13) {
-            var selection = window.getSelection();
-            var range = selection.getRangeAt(0);
-            var br = document.createElement("br");
-            range.insertNode(br);
-            e.preventDefault();
-          }
-        });
-      };
-      function selectionAddStyle(textarea_el, fun) {
-        function createFont(childNode) {
-          var child = childNode; /*.cloneNode(true)*/
-          var font;
-          //console.log([child.tagName]);
-          if (child.tagName === undefined) {
-            font = document.createElement("font");
-            font.appendChild(child);
-          } else {
-            font = child;
-          }
-          return font;
-        }
-        var selection = window.getSelection();
-
-        if (selection.type === "Range") {
-          var range = selection.getRangeAt(0);
-
-          var startNode;
-          var endNode;
-          var startContainer = range.startContainer;
-          var endContainer = range.endContainer;
-
-          var frag = range.extractContents();
-          var myfrag = document.createDocumentFragment();
-          //console.log(range, frag);
-          var list = [];
-          for (var i = 0; i < frag.childNodes.length; i++) {
-            list.push(frag.childNodes[i]);
-          }
-          for (var i = 0; i < list.length; i++) {
-            var font = createFont(list[i]);
-            if (fun) {
-              fun(font);
+      Vue.use(CKEditor);
+      //ClassicEditor
+      //console.log(CKEditor);
+      const app = new Vue({
+        el: "#app",
+        data: {
+          editorTitle: "",
+          editor: ClassicEditor,
+          editorData: "",
+          editorConfig: {
+            /*toolbar: ["bold", "italic", "bulletedList", "|", "numberedList", "alignment"],
+            removePlugins: ["Heading", "Link"],
+            isReadOnly: true,*/
+            cloudServices: {
+              tokenUrl: "https://example.com/cs-token-endpoint",
+              uploadUrl: "https://your-organization-id.cke-cs.com/easyimage/upload/",
+            },
+          },
+          page: "view", //edit,view
+          pageState: "all",
+          editItem: null,
+          sideNav: [
+            { id: "all", title: "所有記事" },
+            { id: "star", title: "已加星號" },
+          ],
+          list: [
+            { star: true, title: "20200603", content: "", ellipsis: "" },
+            { star: false, title: "20200603", content: "", ellipsis: "" },
+          ],
+          filter: "all",
+        },
+        mounted() {},
+        methods: {
+          ellipsis(text, max = 10) {
+            let s = text;
+            s = s.replace(/\<\w+\>/g, "");
+            s = s.replace(/\<\/\w+\>/g, "");
+            s = s.substring(0, max) + (s.length > max ? "…" : "");
+            return s;
+          },
+          createSummernote() {},
+          close_click() {
+            this.page = "view";
+            this.editorData = "";
+            this.editorTitle = "";
+            this.editItem = null;
+          },
+          save_click() {
+            if (this.page == "new") {
+              this.editItem = { star: false, title: "", title: "", title: "" };
+              this.list.push(this.editItem);
+              this.page = "edit";
             }
-            if (i === 0) {
-              startNode = font;
-            } else if (i === list.length - 1) {
-              endNode = font;
-            }
-            myfrag.appendChild(font);
-          }
-
-          if (!endNode) {
-            endNode = startNode;
-          }
-
-          range.insertNode(myfrag);
-          //取出font堆疊
-          if (
-            startContainer.parentNode == endContainer.parentNode &&
-            startContainer.parentNode.tagName === "FONT"
-          ) {
-            var style = startContainer.parentNode.style;
-            var myfrag = document.createDocumentFragment();
-            var node01 = startContainer.parentNode;
-            var list = [];
-            for (var i = 0; i < node01.childNodes.length; i++) {
-              list.push(node01.childNodes[i]);
-            }
-            for (var i = 0; i < list.length; i++) {
-              console.log(style);
-              var font = createFont(list[i]);
-              font.style.cssText = style.cssText;
-              if (fun) {
-                fun(font);
-              }
-              myfrag.appendChild(font);
-            }
-            node01.remove();
-            range.insertNode(myfrag);
-          }
-          //刪除空白
-          if (
-            startNode.previousSibling &&
-            startNode.previousSibling.tagName === "FONT" &&
-            startNode.previousSibling.textContent === ""
-          ) {
-            startNode.previousSibling.remove();
-          }
-          if (
-            endNode.nextSibling &&
-            endNode.nextSibling.tagName === "FONT" &&
-            endNode.nextSibling.textContent === ""
-          ) {
-            endNode.nextSibling.remove();
-          }
-
-          selection.removeAllRanges();
-
-          if (startNode.firstChild) {
-            range.setStart(startNode.firstChild, 0);
-          } else {
-            range.setStart(startNode, 0);
-          }
-          if (endNode.lastChild) {
-            range.setEnd(endNode.lastChild, endNode.lastChild.length);
-          } else {
-            range.setEnd(endNode, 1);
-          }
-          selection.addRange(range);
-        }
-      }
+            this.editItem.title = this.editorTitle;
+            this.editItem.content = this.editorData;
+            this.editItem.ellipsis = this.ellipsis(this.editorData);
+          },
+          navItem_click(state, item) {
+            this.page = state;
+            this.filter = item.id;
+          },
+          more_click(item) {
+            this.page = "edit";
+            this.editItem = item;
+            this.editorTitle = this.editItem.title;
+            this.editorData = this.editItem.content;
+            //this.$nextTick(this.createSummernote);
+          },
+          new_click() {
+            this.page = "new";
+            this.editorData = "";
+            this.editorTitle = "";
+            this.editItem = null;
+          },
+          star_click(item) {
+            item.star = !item.star;
+          },
+        },
+      });
     </script>
-  </head>
-  <body>
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <label>
-              <span>選擇顏色：</span>
-              <input type="color" id="color" />
-            </label>
-            <label>
-              <span>選擇文字大小：</span>
-              <select id="fontSize">
-                <option value="12">12px</option>
-                <option value="14">14px</option>
-                <option value="16">16px</option>
-                <option value="18">18px</option>
-                <option value="20">20px</option>
-                <option value="22">22px</option>
-                <option value="24">24px</option>
-              </select>
-            </label>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <div contenteditable="true" class="textarea" id="textarea">
-              這裡是一段文字，選擇後可以設定上方的顏色跟文字大小，很陽春沒有任何<font>功能的文字</font>編輯器。<br />
-              這裡是一段文字，選擇後可以設定上方的顏色跟文字大小，很陽春沒有任何功能的文字編輯器。
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </body>
 </html>

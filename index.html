@@ -2,7 +2,10 @@
 <html lang="zh-TW">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1, maximum-scale=1"
+    />
     <title>筆記</title>
     <link
       rel="stylesheet"
@@ -15,107 +18,246 @@
     <style>
       [v-cloak] {
         display: none;
-        /*align-items: flex-start;
-        align-content: flex-start;
-        justify-content: flex-start;
-        align-self: start;*/
       }
     </style>
   </head>
   <body>
-    <div id="app" v-cloak>
-      <div class="d-flex">
-        <div class="content container">
-          <div class="row">
-            <div class="col-sm-3 sidebar my-nav">
-              <nav class="navbar navbar-expand-lg justify-content-center">
-                <button type="button" class="btn btn-primary" @click="new_click">新增筆記</button>
-              </nav>
-              <ul class="nav nav-pills flex-column">
-                <li class="nav-item" v-for="sideItem in sideNav">
-                  <a
-                    class="nav-link"
-                    :class="{active:filter==sideItem.id}"
-                    href="javascript:void(0);"
-                    @click="navItem_click('view',sideItem)"
-                    >{{sideItem.title}}</a
-                  >
-                </li>
-              </ul>
-            </div>
-            <div class="col p-0">
-              <div class="topbar my-nav">
-                <nav class="navbar navbar-expand-lg justify-content-start">
-                  <button type="button" class="btn btn-primary" @click="new_click">新增筆記</button>
-                </nav>
-                <ul class="nav nav-tabs flex-row">
-                  <li class="nav-item" v-for="sideItem in sideNav">
-                    <a
-                      class="nav-link"
-                      :class="{active:filter==sideItem.id}"
-                      href="javascript:void(0);"
-                      @click="navItem_click('view',sideItem)"
-                      >{{sideItem.title}}</a
-                    >
-                  </li>
-                </ul>
-              </div>
-              <div v-if="page=='view'">
-                <div class="container-fluid p-4">
-                  <div class="row">
-                    <div
-                      class="col-lg-6 col-xl-4"
-                      v-for="(item) in list"
-                      v-if="filter=='all'||(filter=='star' && item.star)"
-                    >
-                      <!--card-->
-                      <div class="card mb-4 shadow-sm">
-                        <div class="card-body">
-                          <h5 class="card-title">
-                            <button type="button" class="btn btn-sm p-0" @click="star_click(item)">
-                              <i class="material-icons icon-star" v-if="item.star">star</i>
-                              <i class="material-icons icon-star" v-else>star_border</i>
-                            </button>
-                            <span>{{item.title}}</span>
-                          </h5>
-                          <p class="card-text ellipsis">
-                            <!-- {{ellipsis(item.content)}} -->
-                            {{item.ellipsis}}
-                          </p>
-                          <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-secondary" @click="more_click(item)">
-                              more
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div v-else-if="page=='edit'||page=='new'">
-                <!-- <div id="editor"></div> -->
-                <div class="d-flex flex-column min-vh-100">
-                  <nav class="navbar navbar-expand-lg flex-grow-4 px-0">
-                    <button type="button" class="btn btn-danger btn-sm" @click="close_click">╳</button>
-                    <div class="flex-grow-1 justify-content-end text-right">
-                      <button type="button" class="btn btn-success btn-sm" @click="save_click">儲存</button>
-                    </div>
-                  </nav>
-                  <div class="input-group py-2">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text" id="basic-addon1">標題</span>
-                    </div>
-                    <input type="text" class="flex-fill" v-model="editorTitle" />
-                  </div>
-                  <ckeditor :editor="editor" v-model="editorData" :config="editorConfig"></ckeditor>
-                </div>
-              </div>
-            </div>
+    <template id="nav_template">
+      <ul class="nav nav-tabs">
+        <li class="nav-item" v-for="(item,key) in list">
+          <a class="nav-link" :class="{active:avtiveid==item.id}" href="javascript:void(0);" @click="item_click(item)"
+            >{{item.title}}</a
+          >
+        </li>
+      </ul>
+    </template>
+
+    <template id="cards_template">
+      <div class="container-fluid p-4">
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-4 col-xl-3" v-for="(item) in list">
+            <slot :item="item"></slot>
           </div>
         </div>
       </div>
+    </template>
+
+    <template id="all_page_template">
+      <div class="d-flex flex-fill flex-row">
+        <div class="sidebar">
+          <nav_component
+            class="flex-column p-2"
+            :list="$store.state.navList"
+            :avtiveid="$store.state.pageid"
+            @change="item_click"
+          ></nav_component>
+        </div>
+        <div class="d-flex flex-fill flex-column content">
+          <div class="topbar">
+            <nav_component
+              class="flex-row px-2 pt-2"
+              :list="$store.state.navList"
+              :avtiveid="$store.state.pageid"
+              @change="item_click"
+            ></nav_component>
+          </div>
+          <nav class="navbar navbar-expand-lg justify-content-end tool mb-4">
+            <button
+              type="button"
+              class="btn btn-sm p-0 mr-2"
+              @click="selectAll_click"
+              v-if="selectList.length!=$store.state.dataList.length"
+            >
+              <i class="material-icons icon-color align-middle">select_all</i>
+              <span class="align-middle">全選</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0 mr-2" @click="deselect_click" v-if="selectList.length">
+              <i class="material-icons icon-color align-middle">clear</i>
+              <span class="align-middle">取消</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0 mr-2" @click="delete_click" :disabled="!selectList.length">
+              <i class="material-icons icon-color align-middle">delete</i>
+              <span class="align-middle">刪除</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0 mr-2" @click="star_click" :disabled="!selectList.length">
+              <i class="material-icons icon-color align-middle">star</i>
+              <span class="align-middle">星號</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0" @click="add_click">
+              <i class="material-icons icon-color align-middle">note_add</i>
+              <span class="align-middle">新增筆記</span>
+            </button>
+          </nav>
+          <cards_component :list="$store.state.dataList">
+            <template slot-scope="props">
+              <label class="card mb-4 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <div class="d-flex justify-content-end">
+                      <input type="checkbox" v-model="selectList" :value="props.item" class="ml-2" />
+                    </div>
+                    <i class="material-icons icon-star">{{props.item.star?"star":"star_border"}}</i>
+                    <span v-html="props.item.title"></span>
+                  </h5>
+                  <p class="card-text ellipsis" v-html="props.item.ellipsis"></p>
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary" @click="view_click(props.item)">
+                      查看
+                    </button>
+                  </div>
+                </div>
+              </label>
+            </template>
+          </cards_component>
+        </div>
+      </div>
+    </template>
+    <template id="star_page_template">
+      <div class="d-flex flex-fill flex-row">
+        <div class="sidebar">
+          <nav_component
+            class="flex-column p-2"
+            :list="$store.state.navList"
+            :avtiveid="$store.state.pageid"
+            @change="item_click"
+          ></nav_component>
+        </div>
+        <div class="d-flex flex-fill flex-column content">
+          <div class="topbar">
+            <nav_component
+              class="flex-row px-2 pt-2"
+              :list="$store.state.navList"
+              :avtiveid="$store.state.pageid"
+              @change="item_click"
+            ></nav_component>
+          </div>
+          <cards_component :list="$store.state.dataList">
+            <template slot-scope="props" v-if="props.item.star">
+              <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <span v-html="props.item.title"></span>
+                  </h5>
+                  <p class="card-text ellipsis" v-html="props.item.ellipsis"></p>
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-secondary" @click="view_click(props.item)">
+                      查看
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </cards_component>
+        </div>
+      </div>
+    </template>
+    <template id="garbage_page_template">
+      <div class="d-flex flex-fill flex-row">
+        <div class="sidebar">
+          <nav_component
+            class="flex-column p-2"
+            :list="$store.state.navList"
+            :avtiveid="$store.state.pageid"
+            @change="item_click"
+          ></nav_component>
+        </div>
+        <div class="d-flex flex-fill flex-column content">
+          <div class="topbar">
+            <nav_component
+              class="flex-row px-2 pt-2"
+              :list="$store.state.navList"
+              :avtiveid="$store.state.pageid"
+              @change="item_click"
+            ></nav_component>
+          </div>
+          <nav class="navbar navbar-expand-lg justify-content-end tool mb-4">
+            <button
+              type="button"
+              class="btn btn-sm p-0 mr-2"
+              @click="selectAll_click"
+              v-if="selectList.length!=$store.state.recycleList.length"
+            >
+              <i class="material-icons icon-color align-middle">select_all</i>
+              <span class="align-middle">全選</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0 mr-2" @click="deselect_click" v-if="selectList.length">
+              <i class="material-icons icon-color align-middle">clear</i>
+              <span class="align-middle">取消</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0 mr-2" @click="delete_click" :disabled="!selectList.length">
+              <i class="material-icons icon-color align-middle">
+                delete_forever
+              </i>
+              <span class="align-middle">刪除</span>
+            </button>
+            <button type="button" class="btn btn-sm p-0" @click="restore_click" :disabled="!selectList.length">
+              <i class="material-icons icon-color align-middle">
+                restore_from_trash
+              </i>
+              <span class="align-middle">復原</span>
+            </button>
+          </nav>
+          <cards_component :list="$store.state.recycleList">
+            <template slot-scope="props">
+              <label class="card mb-4 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <div class="d-flex justify-content-end">
+                      <input type="checkbox" v-model="selectList" :value="props.item" class="ml-2" />
+                    </div>
+                    <span v-html="props.item.title"></span>
+                  </h5>
+                  <p class="card-text ellipsis" v-html="props.item.ellipsis"></p>
+                </div>
+              </label>
+            </template>
+          </cards_component>
+        </div>
+      </div>
+    </template>
+    <template id="edit_page_template">
+      <div class="d-flex flex-column min-vh-75 p-2">
+        <nav class="navbar navbar-expand-lg flex-grow-4 px-0">
+          <button type="button" class="btn btn-danger btn-sm" @click="close_click">╳</button>
+          <div class="flex-grow-1 justify-content-end text-right">
+            <button type="button" class="btn btn-success btn-sm" @click="save_click" v-if="save">儲存</button>
+          </div>
+        </nav>
+        <div class="input-group py-2">
+          <div class="input-group-prepend">
+            <span class="input-group-text">標題</span>
+          </div>
+          <input type="text" class="flex-fill" v-model="editorTitle" @input="title_input" />
+        </div>
+        <ckeditor
+          :editor="editor"
+          v-model="editorData"
+          :config="editorConfig"
+          @input="onEditorInput"
+          @ready="onEditorReady"
+        ></ckeditor>
+      </div>
+    </template>
+    <div id="app" v-cloak>
+      <div class="d-flex flex-fill flex-column min-vh-100">
+        <nav class="mainNavbar navbar navbar-expand-lg navbar-light bg-light">
+          <div class="navbar-brand">
+            <span class="material-icons align-middle">
+              description
+            </span>
+            <strong class="align-middle">筆記本</strong>
+          </div>
+          <div class="d-flex flex-fill justify-content-end">
+            <button type="button" class="btn btn-primary">切換深色</button>
+          </div>
+        </nav>
+        <all_page_component v-if="$store.state.pageid=='all'"></all_page_component>
+        <star_page_component v-else-if="$store.state.pageid=='star'"></star_page_component>
+        <garbage_page_component v-else-if="$store.state.pageid=='garbage'"></garbage_page_component>
+        <edit_page_component v-else-if="$store.state.pageid=='edit'"></edit_page_component>
+      </div>
     </div>
+
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -131,14 +273,12 @@
       integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
       crossorigin="anonymous"
     ></script>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/node-waves/0.7.6/waves.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuex@3.4.0/dist/vuex.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/16.0.0/classic/ckeditor.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ckeditor/ckeditor5-vue@1.0.1/dist/ckeditor.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery-ellipsis@0.1.6/dist/jquery.ellipsis.min.js"></script> -->
     <style>
       * {
         font-family: "Noto Sans TC", var(--font-family-sans-serif);
@@ -159,23 +299,85 @@
       .ck-content {
         word-break: break-all;
       }
-      .sidebar.my-nav {
+
+      #app {
+        overflow: hidden;
+      }
+      .sidebar {
         display: none !important;
       }
-      .topbar.my-nav {
+      .topbar {
         display: block !important;
       }
 
-      .icon-star {
-        color: #ffdd00;
+      .sidebar {
+        min-width: 300px;
+        /*background-color: #d7f1fa;*/
+        border-right: 1px solid #dee2e6;
+        box-shadow: 0.0625rem 0 0.125rem rgba(0, 0, 0, 0.075) !important;
       }
 
+      .sidebar .nav-tabs {
+        border-bottom: 0;
+      }
+      .sidebar .nav-tabs .nav-item .nav-link,
+      .sidebar .nav-tabs .nav-link {
+        position: relative;
+        border-width: 1px;
+        border-radius: 0;
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+        margin-right: -0.5rem;
+      }
+      .sidebar .nav-tabs .nav-item.show .nav-link,
+      .sidebar .nav-tabs .nav-link.active {
+        /*background-color: #f2f3f5;*/
+        /*background-image: linear-gradient(to right, #fafbfb, #ffffff);*/
+        border-color: #dee2e6 #fff #dee2e6 #dee2e6;
+        box-shadow: 0.125rem 0 0.25rem rgba(0, 0, 0, 0.075) !important;
+      }
+
+      .sidebar .nav-tabs .nav-link:not(.active):focus,
+      .sidebar .nav-tabs .nav-link:not(.active):hover {
+        border-color: #e9ecef #dee2e6 #e9ecef #e9ecef;
+      }
+
+      .sidebar .nav-tabs .nav-item {
+        margin: 0;
+      }
+      .mainNavbar {
+        border-bottom: 1px solid #dee2e6;
+        box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.075) !important;
+      }
+      .tool .icon-color {
+        color: #2d4257;
+      }
+      .tool {
+        border-bottom: 1px solid #dee2e6;
+      }
+
+      .min-vh-75 {
+        min-height: 75vh !important;
+      }
+      .min-vh-50 {
+        min-height: 50vh !important;
+      }
+      .min-vh-25 {
+        min-height: 25vh !important;
+      }
+
+      .content {
+        width: 100%;
+      }
       @media (min-width: 992px) {
-        .sidebar.my-nav {
+        .sidebar {
           display: block !important;
         }
-        .topbar.my-nav {
+        .topbar {
           display: none !important;
+        }
+        .content {
+          width: auto;
         }
       }
       .ellipsis {
@@ -187,184 +389,297 @@
     <script>
       class MyUploadAdapter {
         constructor(loader) {
-          // The file loader instance to use during the upload.
           this.loader = loader;
         }
-
-        // Starts the upload process.
         upload() {
           return this.loader.file.then(
             (file) =>
               new Promise((resolve, reject) => {
-                this._initRequest();
-                this._initListeners(resolve, reject, file);
-                this._sendRequest(file);
+                let reader = new FileReader();
+                reader.onload = () => {
+                  resolve({ default: reader.result });
+                };
+                reader.onerror = () => {
+                  reject(reader.error);
+                };
+                reader.readAsDataURL(file);
               })
           );
-        }
-
-        // Aborts the upload process.
-        abort() {
-          if (this.xhr) {
-            this.xhr.abort();
-          }
-        }
-
-        // Initializes the XMLHttpRequest object using the URL passed to the constructor.
-        _initRequest() {
-          const xhr = (this.xhr = new XMLHttpRequest());
-
-          // Note that your request may look different. It is up to you and your editor
-          // integration to choose the right communication channel. This example uses
-          // a POST request with JSON as a data structure but your configuration
-          // could be different.
-          xhr.open("POST", "https://example.com/image/upload/path", true);
-          xhr.responseType = "json";
-        }
-
-        // Initializes XMLHttpRequest listeners.
-        _initListeners(resolve, reject, file) {
-          const xhr = this.xhr;
-          const loader = this.loader;
-          const genericErrorText = `Couldn't upload file: ${file.name}.`;
-
-          xhr.addEventListener("error", () => reject(genericErrorText));
-          xhr.addEventListener("abort", () => reject());
-          xhr.addEventListener("load", () => {
-            const response = xhr.response;
-
-            // This example assumes the XHR server's "response" object will come with
-            // an "error" which has its own "message" that can be passed to reject()
-            // in the upload promise.
-            //
-            // Your integration may handle upload errors in a different way so make sure
-            // it is done properly. The reject() function must be called when the upload fails.
-            if (!response || response.error) {
-              return reject(response && response.error ? response.error.message : genericErrorText);
-            }
-
-            // If the upload is successful, resolve the upload promise with an object containing
-            // at least the "default" URL, pointing to the image on the server.
-            // This URL will be used to display the image in the content. Learn more in the
-            // UploadAdapter#upload documentation.
-            resolve({
-              default: response.url,
-            });
-          });
-
-          // Upload progress when it is supported. The file loader has the #uploadTotal and #uploaded
-          // properties which are used e.g. to display the upload progress bar in the editor
-          // user interface.
-          if (xhr.upload) {
-            xhr.upload.addEventListener("progress", (evt) => {
-              if (evt.lengthComputable) {
-                loader.uploadTotal = evt.total;
-                loader.uploaded = evt.loaded;
-              }
-            });
-          }
-        }
-
-        // Prepares the data and sends the request.
-        _sendRequest(file) {
-          // Prepare the form data.
-          const data = new FormData();
-
-          data.append("upload", file);
-
-          // Important note: This is the right place to implement security mechanisms
-          // like authentication and CSRF protection. For instance, you can use
-          // XMLHttpRequest.setRequestHeader() to set the request headers containing
-          // the CSRF token generated earlier by your application.
-
-          // Send the request.
-          this.xhr.send(data);
         }
       }
       function MyCustomUploadAdapterPlugin(editor) {
         editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-          // Configure the URL to the upload script in your back-end here!
           return new MyUploadAdapter(loader);
         };
       }
+      Vue.use(Vuex);
       Vue.use(CKEditor);
-      //ClassicEditor
-      //console.log(CKEditor);
-      const app = new Vue({
-        el: "#app",
-        data: {
-          editorTitle: "",
-          editor: ClassicEditor,
-          editorData: "",
-          editorConfig: {
-            /*toolbar: ["bold", "italic", "bulletedList", "|", "numberedList", "alignment"],
-            removePlugins: ["Heading", "Link"],
-            isReadOnly: true,*/
-            /*cloudServices: {
-              uploadUrl: "http://example.com/image/upload/",
-            },*/
-            extraPlugins: [MyCustomUploadAdapterPlugin],
-          },
-          page: "view", //edit,view
-          pageState: "all",
-          editItem: null,
-          sideNav: [
-            { id: "all", title: "所有記事" },
-            { id: "star", title: "已加星號" },
-          ],
-          list: [
-            { star: true, title: "20200603", content: "", ellipsis: "" },
-            { star: false, title: "20200603", content: "", ellipsis: "" },
-          ],
-          filter: "all",
+      Vue.component("nav_component", {
+        props: {
+          list: Array,
+          avtiveid: String,
         },
-        mounted() {},
+        template: "#nav_template",
         methods: {
-          ellipsis(text, max = 10) {
-            let s = text;
-            s = s.replace(/\<\w+\>/g, "");
-            s = s.replace(/\<\/\w+\>/g, "");
-            s = s.substring(0, max) + (s.length > max ? "…" : "");
-            return s;
+          item_click(item) {
+            this.$emit("change", item);
           },
-          createSummernote() {},
+        },
+      });
+
+      Vue.component("cards_component", {
+        props: {
+          list: Array,
+        },
+        template: "#cards_template",
+        methods: {},
+      });
+
+      Vue.component("all_page_component", {
+        template: "#all_page_template",
+        data() {
+          return { selectList: [] };
+        },
+        methods: {
+          item_click(item) {
+            this.$store.commit("changePage", item.id);
+          },
+          add_click() {
+            this.$store.commit("setEditData", { id: "", title: "", content: "" });
+            this.$store.commit("changePage", "edit");
+          },
+          star_click() {},
+          view_click(item) {
+            this.$store.commit("setEditData", { id: item.id, title: item.title, content: item.content });
+            this.$store.commit("changePage", "edit");
+          },
+          delete_click() {
+            while (this.selectList.length) {
+              this.$store.commit("removeDataItem", this.selectList.pop().id);
+            }
+          },
+          star_click() {
+            let bool = !this.selectList.every((el) => el.star);
+            for (let i = 0; i < this.selectList.length; i++) {
+              this.$store.commit("setStarDataItem", { id: this.selectList[i].id, bool: bool });
+            }
+          },
+          selectAll_click() {
+            this.selectList = [];
+            for (let i = 0; i < this.$store.state.dataList.length; i++) {
+              this.selectList.push(this.$store.state.dataList[i]);
+            }
+          },
+          deselect_click() {
+            this.selectList = [];
+          },
+        },
+      });
+
+      Vue.component("star_page_component", {
+        template: "#star_page_template",
+        methods: {
+          item_click(item) {
+            this.$store.commit("changePage", item.id);
+          },
+        },
+      });
+
+      Vue.component("garbage_page_component", {
+        template: "#garbage_page_template",
+        data() {
+          return { selectList: [] };
+        },
+        methods: {
+          item_click(item) {
+            this.$store.commit("changePage", item.id);
+          },
+          selectAll_click() {
+            this.selectList = [];
+            for (let i = 0; i < this.$store.state.recycleList.length; i++) {
+              this.selectList.push(this.$store.state.recycleList[i]);
+            }
+          },
+          deselect_click() {
+            this.selectList = [];
+          },
+          delete_click() {
+            while (this.selectList.length) {
+              this.$store.commit("removeRecycleItem", this.selectList.pop().id);
+            }
+          },
+          restore_click() {
+            while (this.selectList.length) {
+              this.$store.commit("restoreRecycleItem", this.selectList.pop().id);
+            }
+          },
+        },
+      });
+
+      Vue.component("edit_page_component", {
+        props: {
+          /*list: Array,
+          avtiveid: String,*/
+        },
+        data() {
+          return {
+            editorTitle: this.$store.state.editData.title,
+            editor: ClassicEditor,
+            editorData: this.$store.state.editData.content,
+            editorConfig: {
+              extraPlugins: [MyCustomUploadAdapterPlugin],
+            },
+            save: false,
+          };
+        },
+        template: "#edit_page_template",
+        methods: {
+          /*item_click(item) {
+            this.$emit("change", item);
+          },*/
+          title_input: function () {
+            this.save = true;
+          },
+          onEditorReady(e) {
+            this.save = false;
+          },
+          onEditorInput(e) {
+            this.save = true;
+          },
           close_click() {
-            this.page = "view";
-            this.editorData = "";
-            this.editorTitle = "";
-            this.editItem = null;
+            if (!this.save || confirm("尚未儲存是否離開")) {
+              this.$store.commit("clearEditData");
+              this.$store.commit("changePage", this.$store.state.prev_pageid);
+              this.save = false;
+            }
           },
           save_click() {
-            if (this.page == "new") {
-              this.editItem = { star: false, title: "", title: "", title: "" };
-              this.list.push(this.editItem);
-              this.page = "edit";
-            }
-            this.editItem.title = this.editorTitle;
-            this.editItem.content = this.editorData;
-            this.editItem.ellipsis = this.ellipsis(this.editorData);
-          },
-          navItem_click(state, item) {
-            this.page = state;
-            this.filter = item.id;
-          },
-          more_click(item) {
-            this.page = "edit";
-            this.editItem = item;
-            this.editorTitle = this.editItem.title;
-            this.editorData = this.editItem.content;
-            //this.$nextTick(this.createSummernote);
-          },
-          new_click() {
-            this.page = "new";
-            this.editorData = "";
-            this.editorTitle = "";
-            this.editItem = null;
-          },
-          star_click(item) {
-            item.star = !item.star;
+            this.$store.commit("saveEditData", {
+              title: this.editorTitle,
+              content: this.editorData,
+            });
+            this.save = false;
           },
         },
+      });
+
+      let ellipsis = function (text, max = 10) {
+        let s = text.replace(/<(?:.|\s)*?>/g, "");
+        let s0 = "";
+        let i = 0;
+        let count = 0;
+        while (count < max + 1 && i < s.length) {
+          if (count < max) {
+            let ss = s.substring(i, i + 6);
+            if (ss == "&nbsp;") {
+              s0 += ss;
+              i += 6;
+            } else {
+              s0 += ss.charAt(0);
+              i++;
+            }
+          } else {
+            s0 += "…";
+          }
+          count++;
+        }
+        return s0;
+      };
+      function guid() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+          var r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      }
+
+      const store = new Vuex.Store({
+        state: {
+          prev_pageid: "",
+          pageid: "all",
+          navList: [
+            { id: "all", title: "所有記事", pageData: "view-all" },
+            { id: "star", title: "已加星號", pageData: "view-star" },
+            { id: "garbage", title: "垃圾桶", pageData: "view-garbage" },
+          ],
+          dataList: [
+            { id: guid(), star: true, title: "20200603", content: "", ellipsis: "" },
+            { id: guid(), star: false, title: "20200603", content: "", ellipsis: "" },
+            { id: guid(), star: false, title: "20200603", content: "", ellipsis: "" },
+            { id: guid(), star: false, title: "20200603", content: "", ellipsis: "" },
+            { id: guid(), star: false, title: "20200603", content: "", ellipsis: "" },
+          ],
+          recycleList: [
+            { id: guid(), star: false, title: "20200603", content: "", ellipsis: "" },
+            { id: guid(), star: true, title: "20200603", content: "", ellipsis: "" },
+          ],
+          editData: null,
+        },
+        mutations: {
+          changePage(state, id) {
+            state.prev_pageid = state.pageid;
+            state.pageid = id;
+          },
+          setEditData(state, data) {
+            state.editData = data;
+          },
+          saveEditData(state, data) {
+            let index;
+            if (state.editData.id === "") {
+              state.editData.id = guid();
+              index = state.dataList.length;
+              state.dataList.push({ star: false, id: state.editData.id });
+            } else {
+              index = state.dataList.findIndex(function (el) {
+                return el.id == state.editData.id;
+              });
+            }
+            let item = state.dataList[index];
+            item.title = data.title;
+            item.content = data.content;
+            item.ellipsis = ellipsis(data.content, 10);
+          },
+          clearEditData(state) {
+            state.editData = null;
+          },
+          removeDataItem(state, id) {
+            let index = state.dataList.findIndex(function (el) {
+              return el.id == id;
+            });
+            if (index >= 0) {
+              state.recycleList.push(...state.dataList.splice(index, 1));
+            }
+          },
+          setStarDataItem(state, data) {
+            let index = state.dataList.findIndex(function (el) {
+              return el.id == data.id;
+            });
+            if (index >= 0) {
+              state.dataList[index].star = data.bool;
+            }
+          },
+          removeRecycleItem(state, id) {
+            let index = state.recycleList.findIndex(function (el) {
+              return el.id == id;
+            });
+            if (index >= 0) {
+              state.recycleList.splice(index, 1);
+            }
+          },
+          restoreRecycleItem(state, id) {
+            let index = state.recycleList.findIndex(function (el) {
+              return el.id == id;
+            });
+            if (index >= 0) {
+              state.dataList.push(...state.recycleList.splice(index, 1));
+            }
+          },
+        },
+      });
+
+      const app = new Vue({
+        el: "#app",
+        store: store,
       });
     </script>
   </body>

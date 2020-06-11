@@ -1,0 +1,58 @@
+{
+  "name": "NOTE",
+  "version": "1.0.0",
+  "description": "[線上觀看](https://virtools.github.io/NOTE/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production",
+    "start": "node server.js",
+    "dev": "webpack-dev-server --mode development",
+    "dev-open": "webpack-dev-server --mode development --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/virtools/NOTE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/virtools/NOTE/issues"
+  },
+  "homepage": "https://github.com/virtools/NOTE#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@ckeditor/ckeditor5-build-classic": "^19.0.2",
+    "@ckeditor/ckeditor5-vue": "^1.0.1",
+    "babel-loader": "^8.1.0",
+    "bootstrap": "^4.5.0",
+    "bootstrap-vue": "^2.15.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.5.3",
+    "express": "^4.17.1",
+    "file-loader": "^6.0.0",
+    "html-webpack-plugin": "^4.3.0",
+    "jquery": "^3.5.1",
+    "material-design-icons": "^3.0.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.14.1",
+    "popper.js": "^1.16.1",
+    "pug": "^3.0.0",
+    "pug-plain-loader": "^1.0.0",
+    "sass": "^1.26.8",
+    "sass-loader": "^8.0.2",
+    "vue": "^2.6.11",
+    "vue-cli": "^2.9.6",
+    "vue-loader": "^15.9.2",
+    "vue-router": "^3.3.2",
+    "vue-style-loader": "^4.1.2",
+    "vue-template-compiler": "^2.6.11",
+    "vuex": "^3.4.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

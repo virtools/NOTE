@@ -11,9 +11,9 @@ export default {
   props: {
     icon: {
       type: String,
-      default: ""
-    }
-  }
+      default: "",
+    },
+  },
 };
 </script>
 <style scoped></style>

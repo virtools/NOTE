@@ -109,6 +109,10 @@ module.exports = {
         ],
       },
       //字型載入器
+      /*{
+        test: /\.(json|json5)$/,
+        loader: "json5-loader",
+      },*/
     ],
   },
   plugins: [

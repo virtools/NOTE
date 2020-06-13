@@ -37,7 +37,7 @@ module.exports = {
         test: /\.vue$/,
         loader: "vue-loader",
       },
-      //vue模板載入器
+      //vue元件載入器
       /*{
         test: /\.scss$/,
         loader: "style!css!sass?sourceMap",

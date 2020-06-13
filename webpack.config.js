@@ -1,12 +1,11 @@
 const path = require("path");
-//const webpack = require("webpack");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-//const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //css抽取
+const HtmlWebpackPlugin = require("html-webpack-plugin"); //提取跟注入
+const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin"); //壓縮css
+const { CleanWebpackPlugin } = require("clean-webpack-plugin"); //清除檔案資料
 module.exports = {
   resolve: {
-    //extensions: ['*', '.js', '.vue'],
     alias: {
       "@css": path.resolve(__dirname, "./src/css/"),
       "@js": path.resolve(__dirname, "./src/js/"),
@@ -71,10 +70,6 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       //css提取
-      /*{
-        test: /\.js$/,
-        loader: "babel-loader",
-      },*/
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
@@ -109,13 +104,24 @@ module.exports = {
         ],
       },
       //字型載入器
-      /*{
-        test: /\.(json|json5)$/,
-        loader: "json5-loader",
-      },*/
     ],
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: "vendors",
+          chunks: "all",
+        },
+      },
+    },
+  },
   plugins: [
+    new CleanWebpackPlugin({
+      //cleanOnceBeforeBuildPatterns: ["./js/*", "./css/*", "./fonts/*", "./index,html"],
+      cleanOnceBeforeBuildPatterns: ["./*"],
+    }),
     new VueLoaderPlugin(),
     new MiniCssExtractPlugin({
       filename: "css/[name].[hash].css",
@@ -124,22 +130,6 @@ module.exports = {
       template: "./src/index.html",
       filename: "index.html",
     }),
-    /*new CleanWebpackPlugin(["dist"], {
-      verbose: true,
-    }),*/
+    new OptimizeCssAssetsWebpackPlugin(),
   ],
-  /*plugins: [
-    new webpack.optimize.CommonsChunkPlugin({
-      name: "vendor",
-      filename: "common.js",
-    }),
-  ],*/
-  /*resolve: {
-    alias: {
-      // If using the runtime only build
-      vue$: "vue/dist/vue.runtime.esm.js", // 'vue/dist/vue.runtime.common.js' for webpack 1
-      // Or if using full build of Vue (runtime + compiler)
-      // vue$: 'vue/dist/vue.esm.js'      // 'vue/dist/vue.common.js' for webpack 1
-    },
-  },*/
 };

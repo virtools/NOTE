@@ -1,5 +1,5 @@
 const path = require("path");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const VueLoaderPlugin = require("vue-loader/lib/plugin"); //vue載入器插件
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //css抽取
 const HtmlWebpackPlugin = require("html-webpack-plugin"); //提取跟注入
 const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plugin"); //壓縮css
@@ -82,10 +82,15 @@ module.exports = {
       },
       //js轉舊
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpg|jpe?g|gif|svg)$/i,
         use: [
           {
             loader: "file-loader",
+            options: {
+              name: "img/[name].[ext]",
+              publicPath: "../",
+              //outputPath: "/",
+            },
           },
         ],
       },
@@ -96,9 +101,9 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              name: "[name].[ext]",
-              outputPath: "./fonts/",
-              publicPath: "../fonts/",
+              name: "fonts/[name].[ext]",
+              publicPath: "../",
+              //outputPath: "./",
             },
           },
         ],

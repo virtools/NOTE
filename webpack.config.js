@@ -6,6 +6,7 @@ const OptimizeCssAssetsWebpackPlugin = require("optimize-css-assets-webpack-plug
 const { CleanWebpackPlugin } = require("clean-webpack-plugin"); //清除檔案資料
 module.exports = {
   resolve: {
+    //擴展路徑別名
     alias: {
       "@css": path.resolve(__dirname, "./src/css/"),
       "@js": path.resolve(__dirname, "./src/js/"),
@@ -13,7 +14,6 @@ module.exports = {
       "@src": path.resolve(__dirname, "./src/"),
       vue: "vue/dist/vue.esm.js",
     },
-    //擴展路徑別名
   },
   //context: path.resolve(__dirname, "./src"),
   entry: {
@@ -33,20 +33,21 @@ module.exports = {
   },
   module: {
     rules: [
+      //vue元件載入器
       {
         test: /\.vue$/,
         loader: "vue-loader",
       },
-      //vue元件載入器
+      //scss模板載入器
       /*{
         test: /\.scss$/,
         loader: "style!css!sass?sourceMap",
       },*/
-      //scss模板載入器
       {
         test: /\.pug$/,
         loader: "pug-plain-loader",
       },
+      //pug模板載入器
       /*{
         test: /\.pug$/,
         oneOf: [
@@ -59,17 +60,17 @@ module.exports = {
           },
         ],
       },*/
-      //pug模板載入器
+      //vue樣式載入器 css載入器
       /*{
         test: /\.css$/,
         use: ["vue-style-loader", "css-loader"],
       },*/
-      //vue樣式載入器 css載入器
+      //css提取
       {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
-      //css提取
+      //js轉舊
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
@@ -80,7 +81,7 @@ module.exports = {
           },
         },
       },
-      //js轉舊
+      //圖檔載入器
       {
         test: /\.(png|jpg|jpe?g|gif|svg)$/i,
         use: [
@@ -94,7 +95,7 @@ module.exports = {
           },
         ],
       },
-      //圖檔載入器
+      //字型載入器
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         use: [
@@ -108,10 +109,10 @@ module.exports = {
           },
         ],
       },
-      //字型載入器
     ],
   },
   optimization: {
+    //切割檔案
     splitChunks: {
       cacheGroups: {
         commons: {
@@ -121,7 +122,6 @@ module.exports = {
         },
       },
     },
-    //切割檔案
   },
   plugins: [
     new CleanWebpackPlugin({

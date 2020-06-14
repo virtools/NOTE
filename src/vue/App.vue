@@ -12,12 +12,9 @@
           <input type="checkbox" class="custom-control-input" id="customSwitch1" />
           <label class="custom-control-label" for="customSwitch1">Toggle this switch element</label>
         </div>-->
-        <b-form-checkbox
-          v-model="dark"
-          name="check-button"
-          switch
-          :dark="dark"
-        >{{ dark ? "深色" : "淺色" }}</b-form-checkbox>
+        <b-form-checkbox v-model="dark" name="check-button" switch :dark="dark">{{
+          dark ? "深色" : "淺色"
+        }}</b-form-checkbox>
       </div>
     </nav>
     <router-view></router-view>
@@ -28,14 +25,15 @@ export default {
   name: "app",
   data() {
     return {
-      dark: false
+      dark: false,
     };
   },
-  methods: {}
+  methods: {},
 };
 </script>
 <style scoped></style>
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap");
 * {
   font-family: "Noto Sans TC", var(--font-family-sans-serif);
 }
@@ -281,9 +279,7 @@ export default {
 
   /* -- Overrides the default .ck-splitbutton class colors. ----------------------------------- */
 
-  --ck-color-split-button-hover-background: var(
-    --ck-color-button-default-hover-background
-  );
+  --ck-color-split-button-hover-background: var(--ck-color-button-default-hover-background);
   --ck-color-split-button-hover-border: var(--ck-custom-foreground);
 
   /* -- Overrides the default .ck-input class colors. ----------------------------------------- */

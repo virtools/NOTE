@@ -113,7 +113,7 @@ export default {
   methods: {
     update() {
       this.run = true;
-      Axios.get("api/dataList").then(response => {
+      Axios.get("dataList").then(response => {
         this.dataList = response.data;
         this.run = false;
       });
@@ -129,7 +129,7 @@ export default {
     },
     delete_click() {
       this.run = true;
-      Axios.delete("api/dataList", { data: this.selectList }).then(response => {
+      Axios.delete("dataList", { data: this.selectList }).then(response => {
         this.dataList = response.data;
         this.selectList = [];
         this.run = false;
@@ -149,7 +149,7 @@ export default {
           star: bool
         };
       });
-      Axios.post("api/dataList", list).then(response => {
+      Axios.post("dataList", list).then(response => {
         this.dataList = response.data;
         this.run = false;
       });

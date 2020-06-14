@@ -99,7 +99,7 @@ export default {
   methods: {
     update() {
       this.run = true;
-      Axios.get("api/recycleList").then(response => {
+      Axios.get("recycleList").then(response => {
         this.recycleList = response.data;
         this.run = false;
       });
@@ -118,17 +118,15 @@ export default {
     },
     delete_click() {
       this.run = true;
-      Axios.delete("api/recycleList", { data: this.selectList }).then(
-        response => {
-          this.recycleList = response.data;
-          this.selectList = [];
-          this.run = false;
-        }
-      );
+      Axios.delete("recycleList", { data: this.selectList }).then(response => {
+        this.recycleList = response.data;
+        this.selectList = [];
+        this.run = false;
+      });
     },
     restore_click() {
       this.run = true;
-      Axios.post("api/recycleList/restore", this.selectList).then(response => {
+      Axios.post("recycleList/restore", this.selectList).then(response => {
         this.recycleList = response.data;
         this.run = false;
       });

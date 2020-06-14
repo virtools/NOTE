@@ -75,7 +75,7 @@ export default {
         this.editorData = "";
         this.save = 0;
       } else {
-        Axios.get("api/dataList", {
+        Axios.get("dataList", {
           data: { filters: { id: this.$route.params.id } }
         }).then(response => {
           if (response.data.length) {
@@ -101,7 +101,7 @@ export default {
     },
     save_click() {
       if (this.editorId === "") {
-        Axios.put("api/dataList", [
+        Axios.put("dataList", [
           {
             title: this.editorTitle,
             content: this.editorData
@@ -117,7 +117,7 @@ export default {
           this.save = 0;
         });
       } else {
-        Axios.post("api/dataList", [
+        Axios.post("dataList", [
           {
             id: this.editorId,
             title: this.editorTitle,

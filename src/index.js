@@ -119,7 +119,7 @@ const recycleList = [
 Mock.setup({
   timeout: "50-150",
 });
-Mock.mock("api/dataList", "get", (data) => {
+Mock.mock("dataList", "get", (data) => {
   if (data.body) {
     let list = dataList;
     const params = JSON.parse(data.body);
@@ -134,7 +134,7 @@ Mock.mock("api/dataList", "get", (data) => {
   }
   return dataList;
 });
-Mock.mock("api/dataList", "post", (data) => {
+Mock.mock("dataList", "post", (data) => {
   if (data.body) {
     const modifyList = JSON.parse(data.body);
     modifyList.forEach((modifyEl) => {
@@ -157,7 +157,7 @@ Mock.mock("api/dataList", "post", (data) => {
   }
   return dataList;
 });
-Mock.mock("api/dataList", "delete", (data) => {
+Mock.mock("dataList", "delete", (data) => {
   if (data.body) {
     const ids = JSON.parse(data.body);
     ids.forEach((id) => {
@@ -172,7 +172,7 @@ Mock.mock("api/dataList", "delete", (data) => {
   return dataList;
 });
 
-Mock.mock("api/dataList", "put", (data) => {
+Mock.mock("dataList", "put", (data) => {
   const list = [];
   if (data.body) {
     const addList = JSON.parse(data.body);
@@ -189,10 +189,10 @@ Mock.mock("api/dataList", "put", (data) => {
   }
   return list;
 });
-Mock.mock("api/recycleList", "get", (data) => {
+Mock.mock("recycleList", "get", (data) => {
   return recycleList;
 });
-Mock.mock("api/recycleList", "delete", (data) => {
+Mock.mock("recycleList", "delete", (data) => {
   if (data.body) {
     const ids = JSON.parse(data.body);
     ids.forEach((id) => {
@@ -206,7 +206,7 @@ Mock.mock("api/recycleList", "delete", (data) => {
   }
   return recycleList;
 });
-Mock.mock("api/recycleList/restore", "post", (data) => {
+Mock.mock("recycleList/restore", "post", (data) => {
   if (data.body) {
     const ids = JSON.parse(data.body);
     ids.forEach((id) => {

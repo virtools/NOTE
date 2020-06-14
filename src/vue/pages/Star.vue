@@ -66,7 +66,7 @@ export default {
   methods: {
     update() {
       this.run = true;
-      Axios.get("api/dataList", { data: { filters: { star: true } } }).then(
+      Axios.get("dataList", { data: { filters: { star: true } } }).then(
         response => {
           this.dataList = response.data;
           this.run = false;

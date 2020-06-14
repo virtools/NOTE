@@ -101,7 +101,7 @@ export default {
     },
     save_click() {
       if (this.editorId === "") {
-        Axios.put("dataList", [
+        Axios.post("dataList", [
           {
             title: this.editorTitle,
             content: this.editorData
@@ -117,7 +117,7 @@ export default {
           this.save = 0;
         });
       } else {
-        Axios.post("dataList", [
+        Axios.patch("dataList", [
           {
             id: this.editorId,
             title: this.editorTitle,
@@ -127,18 +127,6 @@ export default {
           this.save = 0;
         });
       }
-      /*let id = add ? this.$store.getters.guid : this.editorId;
-      this.$store.commit("saveEditData", {
-        add: add,
-        id: id,
-        title: this.editorTitle,
-        content: this.editorData
-      });
-      this.save = 0;
-      if (add) {
-        this.editorId = id;
-        this.$router.push({ name: "edit", params: { id: id } });
-      }*/
     }
   }
 };

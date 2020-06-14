@@ -134,7 +134,7 @@ Mock.mock("dataList", "get", (data) => {
   }
   return dataList;
 });
-Mock.mock("dataList", "post", (data) => {
+Mock.mock("dataList", "patch", (data) => {
   if (data.body) {
     const modifyList = JSON.parse(data.body);
     modifyList.forEach((modifyEl) => {
@@ -172,7 +172,7 @@ Mock.mock("dataList", "delete", (data) => {
   return dataList;
 });
 
-Mock.mock("dataList", "put", (data) => {
+Mock.mock("dataList", "post", (data) => {
   const list = [];
   if (data.body) {
     const addList = JSON.parse(data.body);

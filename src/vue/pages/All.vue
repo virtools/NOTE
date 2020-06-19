@@ -149,7 +149,7 @@ export default {
           star: bool
         };
       });
-      Axios.post("dataList", list).then(response => {
+      Axios.patch("dataList", list).then(response => {
         this.dataList = response.data;
         this.run = false;
       });

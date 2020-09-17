@@ -68,7 +68,15 @@ module.exports = {
       //css提取
       {
         test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: "../",
+            },
+          },
+          "css-loader",
+        ],
       },
       //js轉舊
       {
@@ -88,8 +96,8 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              name: "img/[name].[ext]",
-              publicPath: "../",
+              name: "img/[name].[hash].[ext]",
+              /*publicPath: "../",*/
               //outputPath: "/",
             },
           },
@@ -102,8 +110,8 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              name: "fonts/[name].[ext]",
-              publicPath: "../",
+              name: "fonts/[name].[hash].[ext]",
+              /*publicPath: "../",*/
               //outputPath: "./",
             },
           },
